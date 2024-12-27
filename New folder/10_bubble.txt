@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <string.h>
+
+// Define a structure to store student information
+typedef struct {
+    int roll_no;
+    char name[50];
+    float percentage;
+} Student;
+
+// Function to perform bubble sort based on percentage
+void bubbleSort(Student students[], int size) {
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = 0; j < size - 1 - i; j++) {
+            // If percentage of the current student is less than the next student
+            if (students[j].percentage < students[j + 1].percentage) {
+                // Swap the students
+                Student temp = students[j];
+                students[j] = students[j + 1];
+                students[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to display student details
+void displayStudent(Student s) {
+    printf("Roll No: %d\n", s.roll_no);
+    printf("Name: %s\n", s.name);
+    printf("Percentage: %.2f%%\n", s.percentage);
+    printf("----------------------\n");
+}
+
+int main() {
+    // Initialize an array of students with Indian names
+    Student students[] = {
+        {101, "Amit Sharma", 85.5},
+        {102, "Priya Reddy", 76.3},
+        {103, "Ravi Kumar", 92.0},
+        {104, "Neha Patel", 89.7},
+        {105, "Rajesh Singh", 91.2},
+        {106, "Anita Gupta", 78.5},
+        {107, "Vijay Sharma", 88.6},
+        {108, "Pooja Desai", 82.4},
+        {109, "Suresh Naidu", 94.3},
+        {110, "Rina Iyer", 80.9},
+        {111, "Akash Joshi", 70.4},
+        {112, "Kavya Menon", 95.5},
+        {113, "Krishna Rao", 87.1},
+        {114, "Aishwarya Patel", 91.8},
+        {115, "Kiran Yadav", 82.0}
+    };
+    
+    int n = sizeof(students) / sizeof(students[0]);
+
+    // Sort students array based on percentage (for finding toppers)
+    bubbleSort(students, n);
+
+    // Display the top 10 students or all students if there are less than 10
+    printf("Top 10 Students:\n");
+    for (int i = 0; i < (n < 10 ? n : 10); i++) {
+        displayStudent(students[i]);
+    }
+
+    return 0;
+}

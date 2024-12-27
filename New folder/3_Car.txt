@@ -1,0 +1,211 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to represent a car model
+typedef struct Car {
+    char model[50];
+    char manufacturer[50];
+    float price;
+    float engineCapacity;
+    struct Car *prev;
+    struct Car *next;
+} Car;
+
+Car *head = NULL;
+
+// Function to create a new car node
+Car* createCar(char *model, char *manufacturer, float price, float engineCapacity) {
+    Car *newCar = (Car*)malloc(sizeof(Car));
+    strcpy(newCar->model, model);
+    strcpy(newCar->manufacturer, manufacturer);
+    newCar->price = price;
+    newCar->engineCapacity = engineCapacity;
+    newCar->prev = NULL;
+    newCar->next = NULL;
+    return newCar;
+}
+
+// Function to insert a new car at the end of the list
+void insertCar() {
+    char model[50], manufacturer[50];
+    float price, engineCapacity;
+    printf("Enter car model: ");
+    scanf("%s", model);
+    printf("Enter manufacturer: ");
+    scanf("%s", manufacturer);
+    printf("Enter price: ");
+    scanf("%f", &price);
+    printf("Enter engine capacity: ");
+    scanf("%f", &engineCapacity);
+
+    Car *newCar = createCar(model, manufacturer, price, engineCapacity);
+
+    if (head == NULL) {
+        head = newCar;
+    } else {
+        Car *temp = head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newCar;
+        newCar->prev = temp;
+    }
+    printf("Car added successfully!\n");
+}
+
+// Function to delete a car by model
+void deleteCar() {
+    char model[50];
+    printf("Enter the model of the car to delete: ");
+    scanf("%s", model);
+
+    Car *temp = head;
+    while (temp != NULL && strcmp(temp->model, model) != 0) {
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Car model not found!\n");
+        return;
+    }
+
+    if (temp->prev != NULL) {
+        temp->prev->next = temp->next;
+    } else {
+        head = temp->next;
+    }
+
+    if (temp->next != NULL) {
+        temp->next->prev = temp->prev;
+    }
+
+    free(temp);
+    printf("Car deleted successfully!\n");
+}
+
+// Function to update the price of a car
+void updateCarPrice() {
+    char model[50];
+    float newPrice;
+    printf("Enter the model of the car to update: ");
+    scanf("%s", model);
+    printf("Enter the new price: ");
+    scanf("%f", &newPrice);
+
+    Car *temp = head;
+    while (temp != NULL && strcmp(temp->model, model) != 0) {
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Car model not found!\n");
+        return;
+    }
+
+    temp->price = newPrice;
+    printf("Car price updated successfully!\n");
+}
+
+// Function to list cars within a price range
+void listCarsByPriceRange() {
+    float minPrice, maxPrice;
+    printf("Enter the minimum price: ");
+    scanf("%f", &minPrice);
+    printf("Enter the maximum price: ");
+    scanf("%f", &maxPrice);
+
+    Car *temp = head;
+    int found = 0;
+    while (temp != NULL) {
+        if (temp->price >= minPrice && temp->price <= maxPrice) {
+            printf("Model: %s, Manufacturer: %s, Price: %.2f, Engine Capacity: %.2f\n",
+                   temp->model, temp->manufacturer, temp->price, temp->engineCapacity);
+            found = 1;
+        }
+        temp = temp->next;
+    }
+
+    if (!found) {
+        printf("No cars found in the given price range!\n");
+    }
+}
+
+// Function to display details of a car by model
+void displayCarDetails() {
+    char model[50];
+    printf("Enter the model of the car: ");
+    scanf("%s", model);
+
+    Car *temp = head;
+    while (temp != NULL && strcmp(temp->model, model) != 0) {
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Car model not found!\n");
+        return;
+    }
+
+    printf("Model: %s, Manufacturer: %s, Price: %.2f, Engine Capacity: %.2f\n",
+           temp->model, temp->manufacturer, temp->price, temp->engineCapacity);
+}
+
+// Function to display all cars
+void displayAllCars() {
+    Car *temp = head;
+    if (temp == NULL) {
+        printf("No cars available!\n");
+        return;
+    }
+
+    while (temp != NULL) {
+        printf("Model: %s, Manufacturer: %s, Price: %.2f, Engine Capacity: %.2f\n",
+               temp->model, temp->manufacturer, temp->price, temp->engineCapacity);
+        temp = temp->next;
+    }
+}
+
+int main() {
+    int choice;
+    do {
+        printf("\nMenu:\n");
+        printf("1. Add new car\n");
+        printf("2. Delete car\n");
+        printf("3. Update car price\n");
+        printf("4. List cars by price range\n");
+        printf("5. Display car details\n");
+        printf("6. Display all cars\n");
+        printf("7. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                insertCar();
+                break;
+            case 2:
+                deleteCar();
+                break;
+            case 3:
+                updateCarPrice();
+                break;
+            case 4:
+                listCarsByPriceRange();
+                break;
+            case 5:
+                displayCarDetails();
+                break;
+            case 6:
+                displayAllCars();
+                break;
+            case 7:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 7);
+
+    return 0;
+}

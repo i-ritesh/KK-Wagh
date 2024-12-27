@@ -1,0 +1,170 @@
+#include <stdio.h>
+#include <limits.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#define MAX_NODES 6
+#define INF INT_MAX
+
+// Function to print the shortest path
+void printSolution(int dist[], int n, int src) {
+    printf("Shortest distance from node %d:\n", src);
+    for (int i = 0; i < n; i++) {
+        if (dist[i] == INF)
+            printf("To node %d: INF\n", i);
+        else
+            printf("To node %d: %d\n", i, dist[i]);
+    }
+}
+
+// Dijkstra's Algorithm using Adjacency Matrix
+void dijkstraMatrix(int graph[MAX_NODES][MAX_NODES], int src, int n) {
+    int dist[n];
+    bool visited[n];
+    
+    // Initialize distance and visited arrays
+    for (int i = 0; i < n; i++) {
+        dist[i] = INF;
+        visited[i] = false;
+    }
+    dist[src] = 0;
+    
+    // Find the shortest path
+    for (int count = 0; count < n - 1; count++) {
+        int u = -1;
+        // Find the node with the minimum distance
+        for (int i = 0; i < n; i++) {
+            if (!visited[i] && (u == -1 || dist[i] < dist[u])) {
+                u = i;
+            }
+        }
+
+        visited[u] = true;
+
+        // Update the distances for the neighbors of u
+        for (int v = 0; v < n; v++) {
+            if (graph[u][v] != INF && !visited[v] && dist[u] != INF && dist[u] + graph[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph[u][v];
+            }
+        }
+    }
+
+    // Print the shortest path
+    printSolution(dist, n, src);
+}
+
+// Adjacency List Representation (for additional clarity)
+typedef struct Node {
+    int vertex;
+    int weight;
+    struct Node* next;
+} Node;
+
+typedef struct Graph {
+    Node* adjList[MAX_NODES];
+} Graph;
+
+// Function to create a new node for the adjacency list
+Node* createNode(int v, int weight) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->vertex = v;
+    newNode->weight = weight;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to add an edge to the adjacency list (undirected graph)
+void addEdge(Graph* g, int u, int v, int weight) {
+    Node* newNode = createNode(v, weight);
+    newNode->next = g->adjList[u];
+    g->adjList[u] = newNode;
+
+    newNode = createNode(u, weight);
+    newNode->next = g->adjList[v];
+    g->adjList[v] = newNode;
+}
+
+// Dijkstra's Algorithm using Adjacency List
+void dijkstraList(Graph* g, int src, int n) {
+    int dist[n];
+    bool visited[n];
+    
+    // Initialize distance and visited arrays
+    for (int i = 0; i < n; i++) {
+        dist[i] = INF;
+        visited[i] = false;
+    }
+    dist[src] = 0;
+
+    // Find the shortest path
+    for (int count = 0; count < n - 1; count++) {
+        int u = -1;
+        // Find the node with the minimum distance
+        for (int i = 0; i < n; i++) {
+            if (!visited[i] && (u == -1 || dist[i] < dist[u])) {
+                u = i;
+            }
+        }
+
+        visited[u] = true;
+
+        // Update the distances for the neighbors of u
+        Node* temp = g->adjList[u];
+        while (temp != NULL) {
+            int v = temp->vertex;
+            int weight = temp->weight;
+            if (!visited[v] && dist[u] != INF && dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+            }
+            temp = temp->next;
+        }
+    }
+
+    // Print the shortest path
+    printSolution(dist, n, src);
+}
+
+int main() {
+    // Example: City areas represented as nodes
+    // Let's assume we have 6 areas, numbered from 0 to 5
+    // 0 - Home
+    // 5 - College
+    
+    // Create a graph using adjacency matrix
+    int graph[MAX_NODES][MAX_NODES] = {
+        {0, 7, 9, INF, INF, INF},
+        {7, 0, 10, 15, INF, INF},
+        {9, 10, 0, 11, INF, 2},
+        {INF, 15, 11, 0, 6, INF},
+        {INF, INF, INF, 6, 0, 9},
+        {INF, INF, 2, INF, 9, 0}
+    };
+
+    // Find the shortest path using Dijkstra's Algorithm (Adjacency Matrix)
+    printf("Shortest path from Home (0) to College (5) using Adjacency Matrix:\n");
+    dijkstraMatrix(graph, 0, MAX_NODES);
+    printf("\n");
+
+    // Create a graph using adjacency list
+    Graph* g = (Graph*)malloc(sizeof(Graph));
+    for (int i = 0; i < MAX_NODES; i++) {
+        g->adjList[i] = NULL;
+    }
+
+    // Add edges (representing the city roads)
+    addEdge(g, 0, 1, 7);
+    addEdge(g, 0, 2, 9);
+    addEdge(g, 1, 2, 10);
+    addEdge(g, 1, 3, 15);
+    addEdge(g, 2, 3, 11);
+    addEdge(g, 2, 5, 2);
+    addEdge(g, 3, 4, 6);
+    addEdge(g, 4, 5, 9);
+
+    // Find the shortest path using Dijkstra's Algorithm (Adjacency List)
+    printf("Shortest path from Home (0) to College (5) using Adjacency List:\n");
+    dijkstraList(g, 0, MAX_NODES);
+    printf("\n");
+
+    return 0;
+}

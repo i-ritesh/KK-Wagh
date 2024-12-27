@@ -1,0 +1,147 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Node {
+    char name[50];
+    char phone[15];
+    struct Node *left, *right;
+} Node;
+
+// Create a new BST node
+Node* createNode(char *name, char *phone) {
+    Node *newNode = (Node *)malloc(sizeof(Node));
+    strcpy(newNode->name, name);
+    strcpy(newNode->phone, phone);
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Insert a new entry into the BST
+Node* insert(Node *root, char *name, char *phone) {
+    if (root == NULL) return createNode(name, phone);
+
+    if (strcmp(name, root->name) < 0)
+        root->left = insert(root->left, name, phone);
+    else if (strcmp(name, root->name) > 0)
+        root->right = insert(root->right, name, phone);
+    return root;
+}
+
+// Search for a name in the BST
+Node* search(Node *root, char *name) {
+    if (root == NULL || strcmp(root->name, name) == 0)
+        return root;
+
+    if (strcmp(name, root->name) < 0)
+        return search(root->left, name);
+    return search(root->right, name);
+}
+
+// Find the minimum node in the BST
+Node* findMin(Node *root) {
+    while (root->left != NULL)
+        root = root->left;
+    return root;
+}
+
+// Delete a name from the BST
+Node* delete(Node *root, char *name) {
+    if (root == NULL) return root;
+
+    if (strcmp(name, root->name) < 0)
+        root->left = delete(root->left, name);
+    else if (strcmp(name, root->name) > 0)
+        root->right = delete(root->right, name);
+    else {
+        // Node with only one child or no child
+        if (root->left == NULL) {
+            Node *temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            Node *temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        // Node with two children
+        Node *temp = findMin(root->right);
+        strcpy(root->name, temp->name);
+        strcpy(root->phone, temp->phone);
+        root->right = delete(root->right, temp->name);
+    }
+    return root;
+}
+
+// In-order traversal to display the phonebook
+void inorder(Node *root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("Name: %s, Phone: %s\n", root->name, root->phone);
+        inorder(root->right);
+    }
+}
+
+int main() {
+    Node *root = NULL;
+    int choice;
+    char name[50], phone[15];
+
+    while (1) {
+        printf("\nPhonebook Menu:\n");
+        printf("1. Insert a new contact\n");
+        printf("2. Search for a contact\n");
+        printf("3. Delete a contact\n");
+        printf("4. Display all contacts\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar(); // Consume newline character
+
+        switch (choice) {
+            case 1:
+                printf("Enter name: ");
+                fgets(name, sizeof(name), stdin);
+                name[strcspn(name, "\n")] = 0; // Remove newline character
+                printf("Enter phone number: ");
+                fgets(phone, sizeof(phone), stdin);
+                phone[strcspn(phone, "\n")] = 0; // Remove newline character
+                root = insert(root, name, phone);
+                break;
+
+            case 2:
+                printf("Enter name to search: ");
+                fgets(name, sizeof(name), stdin);
+                name[strcspn(name, "\n")] = 0; // Remove newline character
+                Node *result = search(root, name);
+                if (result != NULL)
+                    printf("Contact found: Name: %s, Phone: %s\n", result->name, result->phone);
+                else
+                    printf("Contact not found.\n");
+                break;
+
+            case 3:
+                printf("Enter name to delete: ");
+                fgets(name, sizeof(name), stdin);
+                name[strcspn(name, "\n")] = 0; // Remove newline character
+                root = delete(root, name);
+                printf("Contact deleted (if it existed).\n");
+                break;
+
+            case 4:
+                printf("Phonebook Entries:\n");
+                inorder(root);
+                break;
+
+            case 5:
+                printf("Exiting...\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}

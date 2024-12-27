@@ -1,0 +1,103 @@
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    int sales_id;
+    char customer_name[50];
+    char product_name[50];
+    int quantity_sold;
+    float total_sale_amount;
+} Sale;
+
+// Function to merge two halves of the array
+void merge(Sale arr[], int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    Sale left_arr[n1], right_arr[n2];
+
+    // Copy data to temporary arrays
+    for (int i = 0; i < n1; i++) {
+        left_arr[i] = arr[left + i];
+    }
+    for (int j = 0; j < n2; j++) {
+        right_arr[j] = arr[mid + 1 + j];
+    }
+
+    int i = 0, j = 0, k = left;
+
+    // Merge the temp arrays back into the original array
+    while (i < n1 && j < n2) {
+        if (left_arr[i].total_sale_amount > right_arr[j].total_sale_amount) {
+            arr[k] = left_arr[i];
+            i++;
+        } else {
+            arr[k] = right_arr[j];
+            j++;
+        }
+        k++;
+    }
+
+    // Copy the remaining elements of left_arr[] if any
+    while (i < n1) {
+        arr[k] = left_arr[i];
+        i++;
+        k++;
+    }
+
+    // Copy the remaining elements of right_arr[] if any
+    while (j < n2) {
+        arr[k] = right_arr[j];
+        j++;
+        k++;
+    }
+}
+
+// Function to implement merge sort
+void mergeSort(Sale arr[], int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+
+        // Sort first and second halves
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+
+        // Merge the sorted halves
+        merge(arr, left, mid, right);
+    }
+}
+
+// Function to display the sales data
+void displaySales(Sale sale) {
+    printf("Sales ID: %d\n", sale.sales_id);
+    printf("Customer Name: %s\n", sale.customer_name);
+    printf("Product Name: %s\n", sale.product_name);
+    printf("Quantity Sold: %d\n", sale.quantity_sold);
+    printf("Total Sale Amount: %.2f\n", sale.total_sale_amount);
+    printf("--------------------------\n");
+}
+
+int main() {
+    // Example sales data
+    Sale sales[] = {
+        {101, "Rajesh Kumar", "Laptop", 2, 50000},
+        {102, "Sita Rani", "Smartphone", 1, 15000},
+        {103, "Amit Sharma", "Tablet", 3, 30000},
+        {104, "Pooja Gupta", "Headphones", 4, 8000},
+        {105, "Ravi Verma", "Camera", 1, 25000},
+        {106, "Neha Patel", "Smartwatch", 5, 20000}
+    };
+
+    int n = sizeof(sales) / sizeof(sales[0]);
+
+    // Sort the sales data based on total sale amount using Merge Sort
+    mergeSort(sales, 0, n - 1);
+
+    // Display sorted sales data
+    printf("Sales Data Sorted by Total Sale Amount (Descending):\n");
+    for (int i = 0; i < n; i++) {
+        displaySales(sales[i]);
+    }
+
+    return 0;
+}

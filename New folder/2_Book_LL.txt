@@ -1,0 +1,168 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Define a structure for a book
+typedef struct Book {
+    int id;
+    char title[100];
+    struct Book *next;
+} Book;
+
+// Function to create a new book node
+Book* createBook(int id, char *title) {
+    Book *newBook = (Book *)malloc(sizeof(Book));
+    newBook->id = id;
+    strcpy(newBook->title, title);
+    newBook->next = NULL;
+    return newBook;
+}
+
+// Function to add a book to the linked list
+void addBook(Book **head, int id, char *title) {
+    Book *newBook = createBook(id, title);
+    if (*head == NULL) {
+        *head = newBook;
+    } else {
+        Book *temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newBook;
+    }
+    printf("Book added successfully!\n");
+}
+
+// Function to remove a book by ID
+void removeBook(Book **head, int id) {
+    if (*head == NULL) {
+        printf("The list is empty. No book to remove.\n");
+        return;
+    }
+
+    Book *temp = *head;
+    Book *prev = NULL;
+
+    // If the book to be removed is the first node
+    if (temp != NULL && temp->id == id) {
+        *head = temp->next;
+        free(temp);
+        printf("Book removed successfully!\n");
+        return;
+    }
+
+    // Search for the book to be removed
+    while (temp != NULL && temp->id != id) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    // If the book was not found
+    if (temp == NULL) {
+        printf("Book not found.\n");
+        return;
+    }
+
+    // Unlink the node and free memory
+    prev->next = temp->next;
+    free(temp);
+    printf("Book removed successfully!\n");
+}
+
+// Function to display all books
+void displayBooks(Book *head) {
+    if (head == NULL) {
+        printf("No books available.\n");
+        return;
+    }
+
+    Book *temp = head;
+    printf("\nBooks available:\n");
+    while (temp != NULL) {
+        printf("ID: %d, Title: %s\n", temp->id, temp->title);
+        temp = temp->next;
+    }
+}
+
+// Function to search for a book by ID
+void searchBook(Book *head, int id) {
+    Book *temp = head;
+    while (temp != NULL) {
+        if (temp->id == id) {
+            printf("Book found: ID: %d, Title: %s\n", temp->id, temp->title);
+            return;
+        }
+        temp = temp->next;
+    }
+    printf("Book not found.\n");
+}
+
+// Function to count the total number of books
+int countBooks(Book *head) {
+    int count = 0;
+    Book *temp = head;
+    while (temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+    return count;
+}
+
+int main() {
+    Book *head = NULL;
+    int choice, id;
+    char title[100];
+
+    do {
+        printf("\nMenu:\n");
+        printf("1. Add Book\n");
+        printf("2. Remove Book\n");
+        printf("3. Display Books\n");
+        printf("4. Search Book\n");
+        printf("5. Count Books\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter book ID: ");
+                scanf("%d", &id);
+                printf("Enter book title: ");
+                getchar(); // Clear the newline character from the buffer
+                fgets(title, sizeof(title), stdin);
+                title[strcspn(title, "\n")] = 0; // Remove the newline character
+                addBook(&head, id, title);
+                break;
+
+            case 2:
+                printf("Enter book ID to remove: ");
+                scanf("%d", &id);
+                removeBook(&head, id);
+                break;
+
+            case 3:
+                displayBooks(head);
+                break;
+
+            case 4:
+                printf("Enter book ID to search: ");
+                scanf("%d", &id);
+                searchBook(head, id);
+                break;
+
+            case 5:
+                printf("Total number of books: %d\n", countBooks(head));
+                break;
+
+            case 6:
+                printf("Exiting program.\n");
+                break;
+
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 6);
+
+    return 0;
+}

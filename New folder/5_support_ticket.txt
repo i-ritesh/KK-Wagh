@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 5 // Maximum number of tickets in the queue
+
+typedef struct {
+    int id;
+    char description[100];
+} Ticket;
+
+typedef struct {
+    Ticket queue[MAX];
+    int front;
+    int rear;
+    int size;
+} CircularQueue;
+
+// Initialize the circular queue
+void initQueue(CircularQueue *cq) {
+    cq->front = 0;
+    cq->rear = -1;
+    cq->size = 0;
+}
+
+// Check if the queue is full
+int isFull(CircularQueue *cq) {
+    return cq->size == MAX;
+}
+
+// Check if the queue is empty
+int isEmpty(CircularQueue *cq) {
+    return cq->size == 0;
+}
+
+// Add a ticket to the queue
+void enqueue(CircularQueue *cq, int id, char *description) {
+    if (isFull(cq)) {
+        printf("Queue is full! Cannot add more tickets.\n");
+        return;
+    }
+    cq->rear = (cq->rear + 1) % MAX;
+    cq->queue[cq->rear].id = id;
+    strcpy(cq->queue[cq->rear].description, description);
+    cq->size++;
+    printf("Ticket #%d added to the queue.\n", id);
+}
+
+// Remove and process a ticket from the queue
+void dequeue(CircularQueue *cq) {
+    if (isEmpty(cq)) {
+        printf("Queue is empty! No tickets to process.\n");
+        return;
+    }
+    printf("Processing Ticket #%d: %s\n", cq->queue[cq->front].id, cq->queue[cq->front].description);
+    cq->front = (cq->front + 1) % MAX;
+    cq->size--;
+}
+
+// Display the current status of the queue
+void displayQueue(CircularQueue *cq) {
+    if (isEmpty(cq)) {
+        printf("Queue is empty!\n");
+        return;
+    }
+    printf("Current Queue Status:\n");
+    int count = cq->size;
+    int i = cq->front;
+    while (count--) {
+        printf("Ticket #%d: %s\n", cq->queue[i].id, cq->queue[i].description);
+        i = (i + 1) % MAX;
+    }
+}
+
+int main() {
+    CircularQueue cq;
+    initQueue(&cq);
+
+    int choice, id;
+    char description[100];
+
+    while (1) {
+        printf("\nCustomer Support Ticket Management\n");
+        printf("1. Submit a Ticket\n");
+        printf("2. Process a Ticket\n");
+        printf("3. Display Queue Status\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                if (isFull(&cq)) {
+                    printf("Queue is full! Cannot submit more tickets.\n");
+                } else {
+                    printf("Enter Ticket ID: ");
+                    scanf("%d", &id);
+                    printf("Enter Ticket Description: ");
+                    getchar(); // Consume newline character
+                    fgets(description, sizeof(description), stdin);
+                    description[strcspn(description, "\n")] = 0; // Remove newline
+                    enqueue(&cq, id, description);
+                }
+                break;
+
+            case 2:
+                dequeue(&cq);
+                break;
+
+            case 3:
+                displayQueue(&cq);
+                break;
+
+            case 4:
+                printf("Exiting...\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
