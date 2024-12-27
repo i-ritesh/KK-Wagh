@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <limits.h>
+#include <stdbool.h>  // Required for bool, true, and false
+#include <stdlib.h>   // Required for malloc and free
 
 #define V 6  // Number of nodes in the graph (areas in the city)
 
